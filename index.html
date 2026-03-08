@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>《可爱过敏原》橙光风格文字游戏 - 合成版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            width: 1200px;
+            height: 700px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* 合成背景图容器 */
+        .composite-background {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.5s ease;
+        }
+        
+        /* 场景遮罩 */
+        .scene-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+        
+        /* 对话框 */
+        .dialog-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 250px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            border-top: 3px solid #ff6b6b;
+            z-index: 4;
+            padding: 20px 40px;
+        }
+        
+        .speaker {
+            color: #ff6b6b;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .content {
+            color: #fff;
+            font-size: 20px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .choices {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .choice-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+        }
+        
+        .choice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,107,107,0.5);
+        }
+        
+        /* 标题屏幕 */
+        .title-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('f02ef98bbba8dedeb741a75dad3cd819.png');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .title {
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .start-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,107,107,0.6);
+        }
+        
+        /* 状态栏 */
+        .status-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 16px;
+            z-index: 5;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* 音乐控制 */
+        .music-control {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 16px;
+            z-index: 5;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .music-control:hover {
+            background: rgba(0,0,0,0.8);
+            transform: scale(1.05);
+        }
+        
+        /* 存档控制 */
+        .save-control {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 16px;
+            z-index: 5;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .save-control:hover {
+            background: rgba(0,0,0,0.8);
+            transform: scale(1.05);
+        }
+        
+        /* 存档菜单 */
+        .save-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            z-index: 100;
+            min-width: 400px;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+        
+        .save-slot {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .save-slot:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .save-slot.empty {
+            opacity: 0.6;
+        }
+        
+        .save-info {
+            font-size: 14px;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- 合成背景图容器 -->
+        <div class="composite-background" id="compositeBackground"></div>
+        <div class="scene-overlay"></div>
+        
+        <!-- 对话框 -->
+        <div class="dialog-container">
+            <div class="speaker" id="speaker">系统</div>
+            <div class="content" id="content">欢迎来到《可爱过敏原》橙光风格文字游戏！</div>
+            <div class="choices" id="choices"></div>
+        </div>
+        
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>健康: <span id="health">100</span></span> | 
+            <span>关系: <span id="relationship">50</span></span> | 
+            <span>章节: <span id="chapter">0</span></span>
+        </div>
+        
+        <!-- 音乐控制 -->
+        <div class="music-control" id="musicControl" onclick="toggleMusic()">
+            <span id="musicStatus">🎵 音乐: 开</span>
+        </div>
+        
+        <!-- 存档控制 -->
+        <div class="save-control" id="saveControl" onclick="toggleSaveMenu()">
+            <span>💾 存档</span>
+        </div>
+        
+        <!-- 存档菜单 -->
+        <div class="save-menu" id="saveMenu">
+            <h3>存档管理</h3>
+            <div class="save-slot" onclick="saveGame(1)">
+                <div>存档位 1 <span class="save-info" id="saveInfo1">空</span></div>
+            </div>
+            <div class="save-slot" onclick="saveGame(2)">
+                <div>存档位 2 <span class="save-info" id="saveInfo2">空</span></div>
+            </div>
+            <div class="save-slot" onclick="saveGame(3)">
+                <div>存档位 3 <span class="save-info" id="saveInfo3">空</span></div>
+            </div>
+            <br>
+            <div class="save-slot" onclick="loadGame(1)">
+                <div>读取存档 1</div>
+            </div>
+            <div class="save-slot" onclick="loadGame(2)">
+                <div>读取存档 2</div>
+            </div>
+            <div class="save-slot" onclick="loadGame(3)">
+                <div>读取存档 3</div>
+            </div>
+            <br>
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="toggleSaveMenu()" style="padding: 8px 20px; background: #ff6b6b; border: none; border-radius: 5px; color: white; cursor: pointer;">关闭</button>
+            </div>
+        </div>
+        
+        <!-- 背景音乐 -->
+        <audio id="bgMusic" loop preload="auto">
+            <source src="换花、邂逅、浪漫、元宵、椰城、民谣、氛围感、爱情、夜游、海岛_爱给网_aigei_com.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放。
+        </audio>
+        
+        <!-- 标题屏幕 -->
+        <div class="title-screen" id="titleScreen">
+            <div class="title">《可爱过敏原》</div>
+            <div class="subtitle">橙光风格文字游戏</div>
+            <button class="start-btn" onclick="startGame()">开始游戏</button>
+        </div>
+    </div>
+
+    <script>
+        // 游戏状态
+        const gameState = {
+            chapter: 0,
+            health: 100,
+            relationship: 50,
+            hasEaten: false,
+            isLate: false,
+            hasAllergy: false,
+            musicEnabled: true,
+            currentScene: 'chapter1',
+            currentDialog: '',
+            currentChoices: []
+        };
+
+        // 合成背景图配置（直接使用合成好的图片）
+        const compositeScenes = {
+            // 第一章：乐知时在家里 + 家场景
+            chapter1: '生成抠图图片(3).png',
+            
+            // 第二章：乐知时在校园 + 校园场景
+            chapter2: '生成抠图图片.png',
+            
+            // 第三章：乐知时难受 + 校园场景
+            chapter3: '生成抠图图片 (2).png',
+            
+            // 第四章：宋煜 + 校园场景
+            chapter4: '生成抠图图片 (1).png'
+        };
+
+        // 开始游戏
+        function startGame() {
+            document.getElementById('titleScreen').style.display = 'none';
+            gameState.chapter = 1;
+            changeCompositeScene('chapter1');
+            
+            // 显示音乐提示，让用户手动开启音乐
+            const musicControl = document.getElementById('musicControl');
+            musicControl.style.display = 'block';
+            
+            showDialog("系统", "新学期的第一天，你在蓉姨的催促声中醒来。蓉姨已经准备好了早餐，但时间有些紧张...早餐选择：", [
+                "快速吃完蓉姨准备的早餐",
+                "路上买早餐",
+                "不吃早餐直接去学校"
+            ]);
+        }
+
+        // 切换音乐
+        function toggleMusic() {
+            const bgMusic = document.getElementById('bgMusic');
+            const musicStatus = document.getElementById('musicStatus');
+            
+            if (gameState.musicEnabled) {
+                bgMusic.pause();
+                musicStatus.textContent = "🔇 音乐: 关";
+                gameState.musicEnabled = false;
+            } else {
+                // 设置音量并播放
+                bgMusic.volume = 0.3;
+                
+                // 尝试直接播放
+                try {
+                    bgMusic.currentTime = 0;
+                    const playPromise = bgMusic.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            musicStatus.textContent = "🎵 音乐: 开";
+                            gameState.musicEnabled = true;
+                        }).catch(error => {
+                            // 如果播放失败，显示详细提示
+                            console.log('音乐播放错误:', error);
+                            showMusicHelp();
+                        });
+                    }
+                } catch (e) {
+                    showMusicHelp();
+                }
+            }
+        }
+        
+        // 显示音乐播放帮助
+        function showMusicHelp() {
+            const musicStatus = document.getElementById('musicStatus');
+            musicStatus.textContent = "🔇 点击启用音乐";
+            
+            // 创建帮助提示
+            const helpDiv = document.createElement('div');
+            helpDiv.style.position = 'absolute';
+            helpDiv.style.top = '50%';
+            helpDiv.style.left = '50%';
+            helpDiv.style.transform = 'translate(-50%, -50%)';
+            helpDiv.style.background = 'rgba(0,0,0,0.9)';
+            helpDiv.style.color = 'white';
+            helpDiv.style.padding = '20px';
+            helpDiv.style.borderRadius = '10px';
+            helpDiv.style.zIndex = '1000';
+            helpDiv.style.textAlign = 'center';
+            helpDiv.innerHTML = `
+                <h3>音乐播放帮助</h3>
+                <p>请按照以下步骤启用音乐：</p>
+                <ol style="text-align: left; margin: 15px 0;">
+                    <li>先点击页面任意位置</li>
+                    <li>然后点击音乐按钮</li>
+                    <li>如果仍然无效，请检查浏览器设置</li>
+                </ol>
+                <button onclick="this.parentElement.remove()" style="padding: 8px 20px; background: #ff6b6b; border: none; border-radius: 5px; color: white; cursor: pointer;">知道了</button>
+            `;
+            
+            document.body.appendChild(helpDiv);
+        }
+        
+        // 页面加载后预加载音乐
+        window.addEventListener('load', function() {
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.load();
+        });
+        
+        // 页面点击事件，解除浏览器自动播放限制
+        document.addEventListener('click', function() {
+            const bgMusic = document.getElementById('bgMusic');
+            if (bgMusic.paused && !gameState.musicEnabled) {
+                // 预加载音乐，为后续播放做准备
+                bgMusic.load();
+            }
+        });
+
+        // 存档系统
+        let saveData = {
+            slot1: null,
+            slot2: null,
+            slot3: null
+        };
+
+        // 初始化存档数据
+        function initSaveData() {
+            const saved = localStorage.getItem('cuteAllergenSaveData');
+            if (saved) {
+                saveData = JSON.parse(saved);
+            }
+            updateSaveSlots();
+        }
+
+        // 更新存档槽显示
+        function updateSaveSlots() {
+            for (let i = 1; i <= 3; i++) {
+                const slot = saveData[`slot${i}`];
+                const infoElement = document.getElementById(`saveInfo${i}`);
+                if (slot) {
+                    infoElement.textContent = `章节 ${slot.chapter} | ${new Date(slot.timestamp).toLocaleString()}`;
+                    infoElement.parentElement.parentElement.classList.remove('empty');
+                } else {
+                    infoElement.textContent = '空';
+                    infoElement.parentElement.parentElement.classList.add('empty');
+                }
+            }
+        }
+
+        // 切换存档菜单
+        function toggleSaveMenu() {
+            const saveMenu = document.getElementById('saveMenu');
+            if (saveMenu.style.display === 'block') {
+                saveMenu.style.display = 'none';
+            } else {
+                saveMenu.style.display = 'block';
+                updateSaveSlots();
+            }
+        }
+
+        // 保存游戏
+        function saveGame(slotNumber) {
+            if (gameState.chapter === 0) {
+                alert('请先开始游戏再保存！');
+                return;
+            }
+
+            const saveSlot = {
+                ...gameState,
+                timestamp: Date.now(),
+                slotNumber: slotNumber
+            };
+
+            saveData[`slot${slotNumber}`] = saveSlot;
+            localStorage.setItem('cuteAllergenSaveData', JSON.stringify(saveData));
+            
+            updateSaveSlots();
+            alert(`游戏已保存到存档位 ${slotNumber}！`);
+        }
+
+        // 加载游戏
+        function loadGame(slotNumber) {
+            const saveSlot = saveData[`slot${slotNumber}`];
+            if (!saveSlot) {
+                alert('该存档位为空！');
+                return;
+            }
+
+            // 恢复游戏状态
+            Object.assign(gameState, saveSlot);
+            
+            // 恢复场景
+            changeCompositeScene(gameState.currentScene);
+            
+            // 恢复对话框
+            if (gameState.currentDialog) {
+                showDialog(gameState.currentDialog.split(':')[0], gameState.currentDialog.split(':')[1], gameState.currentChoices);
+            } else {
+                // 根据章节恢复默认对话框
+                switch(gameState.chapter) {
+                    case 1:
+                        showDialog("系统", "新学期的第一天，你在蓉姨的催促声中醒来...", []);
+                        break;
+                    case 2:
+                        showDialog("系统", "你来到了学校，开始新的学期生活...", []);
+                        break;
+                    case 3:
+                        showDialog("系统", "你的哮喘突然发作...", []);
+                        break;
+                    case 4:
+                        showDialog("系统", "宋煜出现了...", []);
+                        break;
+                }
+            }
+
+            updateStatus();
+            toggleSaveMenu();
+            alert(`已加载存档位 ${slotNumber}！`);
+        }
+
+        // 修改showDialog函数以保存当前对话框状态
+        function showDialog(speaker, text, choices) {
+            const dialogSpeaker = document.getElementById('dialogSpeaker');
+            const dialogText = document.getElementById('dialogText');
+            const choicesElement = document.getElementById('choices');
+            
+            dialogSpeaker.textContent = speaker;
+            dialogText.textContent = text;
+            
+            // 保存当前对话框状态
+            gameState.currentDialog = speaker + ':' + text;
+            gameState.currentChoices = choices;
+            
+            // 清除现有选择
+            choicesElement.innerHTML = '';
+            
+            // 添加新选择
+            choices.forEach((choice, index) => {
+                const choiceElement = document.createElement('div');
+                choiceElement.className = 'choice';
+                choiceElement.textContent = choice;
+                choiceElement.onclick = () => {
+                    handleChoice(index);
+                };
+                choicesElement.appendChild(choiceElement);
+            });
+        }
+
+        // 修改changeCompositeScene以保存当前场景
+        function changeCompositeScene(sceneType) {
+            const compositeBg = document.getElementById('compositeBackground');
+            gameState.currentScene = sceneType;
+            
+            switch(sceneType) {
+                case 'chapter1':
+                    compositeBg.style.backgroundImage = "url('生成抠图图片(3).png')";
+                    break;
+                case 'chapter2':
+                    compositeBg.style.backgroundImage = "url('生成抠图图片.png')";
+                    break;
+                case 'chapter3':
+                    compositeBg.style.backgroundImage = "url('生成抠图图片 (2).png')";
+                    break;
+                case 'chapter4':
+                    compositeBg.style.backgroundImage = "url('生成抠图图片 (1).png')";
+                    break;
+                default:
+                    compositeBg.style.backgroundImage = "url('f02ef98bbba8dedeb741a75dad3cd819.png')";
+            }
+        }
+
+        // 页面加载时初始化存档系统
+        window.addEventListener('load', function() {
+            initSaveData();
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.load();
+        });
+
+        // 切换合成背景场景
+        function changeCompositeScene(sceneType) {
+            const background = document.getElementById('compositeBackground');
+            background.style.backgroundImage = `url('${compositeScenes[sceneType]}')`;
+        }
+
+        // 显示对话框
+        function showDialog(speaker, content, choices) {
+            document.getElementById('speaker').textContent = speaker;
+            document.getElementById('content').textContent = content;
+            
+            const choicesContainer = document.getElementById('choices');
+            choicesContainer.innerHTML = '';
+            
+            choices.forEach((choiceText, index) => {
+                const button = document.createElement('button');
+                button.className = 'choice-btn';
+                button.textContent = choiceText;
+                button.onclick = () => handleChoice(index + 1);
+                choicesContainer.appendChild(button);
+            });
+            
+            updateStatus();
+        }
+
+        // 更新状态栏
+        function updateStatus() {
+            document.getElementById('health').textContent = gameState.health;
+            document.getElementById('relationship').textContent = gameState.relationship;
+            document.getElementById('chapter').textContent = gameState.chapter;
+        }
+
+        // 处理选择
+        function handleChoice(choice) {
+            switch(gameState.chapter) {
+                case 1:
+                    handleChapter1(choice);
+                    break;
+                case 2:
+                    handleChapter2(choice);
+                    break;
+                case 3:
+                    handleChapter3(choice);
+                    break;
+                case 4:
+                    handleChapter4(choice);
+                    break;
+            }
+        }
+
+        // 第一章处理 - 乐知时在家里
+        function handleChapter1(choice) {
+            let speaker, content;
+            
+            switch(choice) {
+                case 1:
+                    speaker = "乐知时";
+                    content = "我快速吃完蓉姨准备的卤牛肉拌米粉，虽然有点赶但还是填饱了肚子。蓉姨欣慰地笑了笑：'慢点吃，别噎着。你哥今天值日，你一个人去学校注意安全。' 健康状态增加10点，但到学校时已经有点迟到了...";
+                    gameState.health += 10;
+                    gameState.hasEaten = true;
+                    gameState.isLate = true;
+                    break;
+                case 2:
+                    speaker = "乐知时";
+                    content = "我告诉蓉姨路上买早餐，匆忙出门后发现卖米粑的婆婆今天没出摊。走进便利店，买了袋米面包，这是少数我能吃的零食。想起宋煜哥哥的叮嘱，我小心地检查了成分表...";
+                    gameState.hasEaten = true;
+                    break;
+                case 3:
+                    speaker = "乐知时";
+                    content = "我完全没吃早餐就冲出门，蓉姨在后面喊：'乐乐！不能不吃早饭！' 但已经骑车远去，心里想着不能迟到。健康状态减少15点，空腹让我感觉有些头晕...";
+                    gameState.health -= 15;
+                    break;
+            }
+            
+            showDialog(speaker, content, ["继续剧情"]);
+            
+            // 延迟进入第二章
+            setTimeout(() => {
+                gameState.chapter = 2;
+                changeCompositeScene('chapter2');
+                showDialog("系统", "你骑着车赶到学校，发现校门口有很多值日生在检查。突然你意识到——铭牌忘戴了！教导主任'圆规'正在严格检查，你的好哥们蒋宇凡试图帮你掩护...关键时刻：你看到宋煜也在值日生的队伍中，他会怎么做？", [
+                    "主动向圆规承认错误",
+                    "让蒋宇凡继续掩护，尝试混过去", 
+                    "期待宋煜哥哥能帮你解围"
+                ]);
+            }, 3000);
+        }
+
+        // 第二章处理 - 乐知时在校园
+        function handleChapter2(choice) {
+            let speaker, content;
+            
+            switch(choice) {
+                case 1:
+                    speaker = "乐知时";
+                    content = "我鼓起勇气向圆规承认忘了戴铭牌。圆规虽然严肃，但欣赏我的诚实：'下次注意，先去参加开学典礼吧。' 宋煜看了我一眼，眼神中似乎有一丝赞许...";
+                    gameState.relationship += 5;
+                    break;
+                case 2:
+                    speaker = "乐知时";
+                    content = "我让蒋宇凡继续掩护，但圆规的火眼金睛还是发现了我们。'你们两个！站住！'圆规严厉地说，'开学第一天就想着蒙混过关？' 宋煜皱了皱眉，似乎对我的行为不太满意...";
+                    gameState.relationship -= 5;
+                    break;
+                case 3:
+                    speaker = "乐知时";
+                    content = "我偷偷看向宋煜，希望他能帮我解围。宋煜注意到了我的目光，但并没有立即行动，只是微微摇头。最终还是圆规发现了我，但宋煜适时开口：'主任，让他先去参加典礼吧。'";
+                    gameState.relationship += 10;
+                    break;
+            }
+            
+            showDialog(speaker, content, ["继续剧情"]);
+            
+            setTimeout(() => {
+                gameState.chapter = 3;
+                gameState.hasAllergy = true;
+                changeCompositeScene('chapter3');
+                showDialog("系统", `开学典礼上，你站在人群中，远远看着台上的宋煜作为学生代表发言。突然，你感觉呼吸有些困难，胸口发闷...因为${gameState.hasEaten ? '吃过早餐' : '没吃早餐'}，加上紧张，你的过敏性哮喘发作了！关键时刻：你感觉眼前发黑，呼吸困难，该怎么办？`, [
+                    "强忍着不适，不想引起注意",
+                    "向身边的同学求助",
+                    "直接倒地，相信宋煜会来救你"
+                ]);
+            }, 3000);
+        }
+
+        // 第三章处理 - 乐知时难受
+        function handleChapter3(choice) {
+            let speaker, content;
+            
+            switch(choice) {
+                case 1:
+                    speaker = "乐知时";
+                    content = "我强忍着不适，但症状越来越严重。最终还是支撑不住倒在地上，引起了全场骚动。宋煜中断发言冲下台来，但我的健康状态大幅下降...";
+                    gameState.health -= 30;
+                    gameState.relationship += 15;
+                    break;
+                case 2:
+                    speaker = "乐知时";
+                    content = "我向身边的蒋宇凡求助，他立即大声呼喊老师。宋煜看到情况，立即中断发言冲下台来。我的及时求助避免了更严重的后果...";
+                    gameState.health -= 15;
+                    gameState.relationship += 10;
+                    break;
+                case 3:
+                    speaker = "乐知时";
+                    content = "我直接倒在地上，现场一片混乱。宋煜毫不犹豫地中断发言，第一时间冲到我身边。全校师生都看到了这一幕，我们的'兄弟'关系再也藏不住了...";
+                    gameState.relationship += 20;
+                    break;
+            }
+            
+            showDialog(speaker, content, ["继续剧情"]);
+            
+            setTimeout(() => {
+                gameState.chapter = 4;
+                changeCompositeScene('chapter4');
+                showDialog("系统", "开学典礼事件后，校园贴吧炸开了锅。'惊！我校初中部校草和高中部校草竟然是兄弟！'的帖子成为热门。宋煜的三大条约被打破了，你们的关系进入了新的阶段...新的开始：面对全校的关注，你和宋煜的关系会如何发展？", [
+                    "主动找宋煜谈谈，表达歉意",
+                    "保持距离，给彼此一些空间", 
+                    "像往常一样对待宋煜"
+                ]);
+            }, 3000);
+        }
+
+        // 第四章处理 - 宋煜出场
+        function handleChapter4(choice) {
+            let speaker, content;
+            
+            switch(choice) {
+                case 1:
+                    speaker = "宋煜";
+                    content = "你找到我，脸上带着愧疚的表情。我说：'不用道歉，这不是你的错。以后记得按时吃饭，随身带药。' 我们的关系反而因为这次事件变得更近了...";
+                    gameState.relationship += 20;
+                    gameState.health += 10;
+                    break;
+                case 2:
+                    speaker = "宋煜";
+                    content = "你刻意保持距离，我也感觉到了。但我们都知道，有些事情已经改变了。在走廊相遇时，你的眼神总是躲闪，这让我有些失落...";
+                    gameState.relationship -= 10;
+                    break;
+                case 3:
+                    speaker = "宋煜";
+                    content = "你像往常一样跟我打招呼，这让我有些意外。但很快我发现，你只是在强装镇定。放学后，我主动叫住你：'乐乐，我们谈谈。'";
+                    gameState.relationship += 15;
+                    break;
+            }
+            
+            showDialog(speaker, content, ["查看结局"]);
+            
+            setTimeout(() => {
+                showEnding();
+            }, 3000);
+        }
+
+        // 显示结局
+        function showEnding() {
+            let endingText = '';
+            
+            if (gameState.relationship >= 80 && gameState.health >= 80) {
+                endingText = "🎉 完美结局：你和宋煜的关系变得更加亲密，他主动承担起照顾你的责任。你们的'兄弟'关系得到了全校的认可，成为了校园里最令人羡慕的组合！";
+            } else if (gameState.relationship >= 60) {
+                endingText = "✨ 良好结局：虽然开学第一天有些波折，但你和宋煜的关系反而因此更近了一步。他开始更加关注你的健康，你们的关系进入了新的阶段。";
+            } else if (gameState.health <= 30) {
+                endingText = "💔 悲伤结局：由于健康问题，你不得不暂时休学治疗。宋煜虽然关心你，但距离让你们的关系变得疏远...";
+            } else {
+                endingText = "📚 普通结局：新学期开始了，你和宋煜的关系回到了原来的状态。但这次经历让你们都成长了许多。";
+            }
+            
+            showDialog("结局", endingText, ["重新开始"]);
+            
+            // 重新开始按钮
+            document.getElementById('choices').innerHTML = '<button class="choice-btn" onclick="restartGame()">重新开始</button>';
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            // 重置游戏状态
+            gameState.chapter = 0;
+            gameState.health = 100;
+            gameState.relationship = 50;
+            gameState.hasEaten = false;
+            gameState.isLate = false;
+            gameState.hasAllergy = false;
+            
+            // 显示标题屏幕
+            document.getElementById('titleScreen').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
